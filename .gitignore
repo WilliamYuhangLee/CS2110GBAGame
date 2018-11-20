@@ -1,1 +1,5 @@
 **/*.o
+**/*.elf
+**/*.gba
+**/*.log
+cmake-build-debug/

@@ -8,7 +8,7 @@
 # The name of your desired application
 # This should be a just a name i.e MyFirstGBAGame
 # No SPACES AFTER THE NAME.
-PROGNAME = AutomatedGarbageCollection
+PROGNAME = Automated\ Garbage\ Collection
 
 # TA-TODO: Add the C files you want compiled here (replace extension with .o)
 # Here you must put a list of all of the object files

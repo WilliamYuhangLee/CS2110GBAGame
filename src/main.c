@@ -43,7 +43,7 @@ int main(void) {
 
     // We store the current and previous values of the button input.
     u32 previousButtons = BUTTONS;
-    u32 currentButtons = BUTTONS;
+    u32 currentButtons;
 
     while(1) {
         // Load the current state of the buttons
