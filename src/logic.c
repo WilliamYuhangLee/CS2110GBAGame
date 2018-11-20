@@ -223,8 +223,8 @@ static void shiftItems(u32 keysPressedNow, TrashCan* trashCan, Item* items[]) {
     trashCan->y += vMove * BASE_VERTICAL_SHIFT_SPEED * 2;
 
     // hard edges
-    if (trashCan->y < 0) {
-        trashCan->y = 0;
+    if (trashCan->y < - trashCan->height / 2) {
+        trashCan->y = (short) (- trashCan->height / 2);
     } else if (trashCan->y > (short) (HEIGHT - 20 - trashCan->height)) {
         trashCan->y = (short) (HEIGHT - 20 - trashCan->height);
     }
@@ -247,7 +247,7 @@ static void shiftItems(u32 keysPressedNow, TrashCan* trashCan, Item* items[]) {
     for(int i = 0; i < ITEM_NUMBER; i++) {
         if (items[i] != NULL) {
             items[i]->x -= items[i]->xv;
-            if (items[i]->x < 0) {
+            if (items[i]->x + items[i]->width < 0) {
                 free(items[i]);
                 items[i] = NULL;
             }
