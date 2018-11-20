@@ -1,13 +1,13 @@
 /*
  * Exported with nin10kit v1.7
- * Time-stamp: Tuesday 11/20/2018, 15:25:05
+ * Time-stamp: Tuesday 11/20/2018, 20:13:55
  * 
  * Image Information
  * -----------------
- * /cs2110/host/images/sources/BACKGROUND_CONTROL_SCREEN.png 240@160
- * /cs2110/host/images/sources/BACKGROUND_END_SCREEN.png 240@160
- * /cs2110/host/images/sources/BACKGROUND_INSTRUCTION_SCREEN.png 240@160
- * /cs2110/host/images/sources/BACKGROUND_START_SCREEN.png 240@160
+ * /cs2110/host/src/images/sources/BACKGROUND_CONTROL_SCREEN.png 240@160
+ * /cs2110/host/src/images/sources/BACKGROUND_END_SCREEN.png 240@160
+ * /cs2110/host/src/images/sources/BACKGROUND_INSTRUCTION_SCREEN.png 240@160
+ * /cs2110/host/src/images/sources/BACKGROUND_START_SCREEN.png 240@160
  * 
  * All bug reports / feature requests are to be filed here https://github.com/TricksterGuy/nin10kit/issues
  */

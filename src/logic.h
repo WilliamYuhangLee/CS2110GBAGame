@@ -22,13 +22,19 @@ typedef struct {
     u8 inflateTimer;
 } TrashCan;
 
+typedef enum {
+   GARBAGE,
+   JEWELRY,
+   BONUS
+} Type;
+
 typedef struct {
     short x;
     short y;
     short width;
     short height;
     short xv;
-    bool isGarbage;
+    Type type;
     u8 id;
 } Item;
 

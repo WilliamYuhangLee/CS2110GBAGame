@@ -40,6 +40,7 @@ void initializeAppState(AppState* appState) {
     for (int i = 0; i < STRATEGY_NUMBER; i++) {
         strategies[i] = 0;
     }
+    strategies[3] = TICK_PER_SECOND * 10;
 }
 
 static void generateStrategy(int strategy, short* newItemTimer, u8* lastID, Item* items[]) {
@@ -48,6 +49,7 @@ static void generateStrategy(int strategy, short* newItemTimer, u8* lastID, Item
     }
     if (strategy >= STRATEGY_NUMBER) {strategy = 0;}
     *newItemTimer = 0;
+    strategies[strategy] = TICK_PER_SECOND * 3;
     Item* item;
     short temp;
     switch (strategy) {
@@ -61,11 +63,10 @@ static void generateStrategy(int strategy, short* newItemTimer, u8* lastID, Item
             item->y = (short) randint(0, HEIGHT - 20 - item->height);
             item->xv = (short) BASE_HORIZONTAL_SHIFT_SPEED;
             item->id = *lastID;
-            item->isGarbage = randint(0, 99) < GARBAGE_CHANCE;
+            item->type = JEWELRY;
             items[*lastID] = item;
             break;
         case 1:
-        case 2:
             if ((item = malloc(sizeof(Item))) == NULL) return;
             *lastID = (u8) ((*lastID + 1) % ITEM_NUMBER);
             item->width = 32;
@@ -74,10 +75,10 @@ static void generateStrategy(int strategy, short* newItemTimer, u8* lastID, Item
             item->y = (short) randint(0, HEIGHT - 20 - item->height);
             item->xv = (short) BASE_HORIZONTAL_SHIFT_SPEED * 2;
             item->id = *lastID;
-            item->isGarbage = randint(0, 99) < GARBAGE_CHANCE;
+            item->type = GARBAGE;
             items[*lastID] = item;
             break;
-        case 3:
+        case 2:
             if ((item = malloc(sizeof(Item))) == NULL) return;
             *lastID = (u8) ((*lastID + 1) % ITEM_NUMBER);
             item->width = 32;
@@ -86,9 +87,21 @@ static void generateStrategy(int strategy, short* newItemTimer, u8* lastID, Item
             item->y = (short) randint(0, HEIGHT - 20 - item->height);
             item->xv = (short) BASE_HORIZONTAL_SHIFT_SPEED * 3;
             item->id = *lastID;
-            item->isGarbage = randint(0, 99) < GARBAGE_CHANCE;
+            item->type = GARBAGE;
             items[*lastID] = item;
-            *newItemTimer = -TICK_PER_SECOND;
+            break;
+        case 3:
+            if ((item = malloc(sizeof(Item))) == NULL) return;
+            *lastID = (u8) ((*lastID + 1) % ITEM_NUMBER);
+            item->width = 16;
+            item->height = 16;
+            item->x = WIDTH;
+            item->y = (short) randint(0, HEIGHT - 20 - item->height);
+            item->xv = (short) BASE_HORIZONTAL_SHIFT_SPEED * 3;
+            item->id = *lastID;
+            item->type = BONUS;
+            items[*lastID] = item;
+            strategies[3] = TICK_PER_SECOND * 10;
             break;
         case 4:
             temp = (short) randint(0, HEIGHT - 20 - 32);
@@ -101,7 +114,7 @@ static void generateStrategy(int strategy, short* newItemTimer, u8* lastID, Item
                 item->y = temp;
                 item->xv = BASE_HORIZONTAL_SHIFT_SPEED * 2;
                 item->id = *lastID;
-                item->isGarbage = true;
+                item->type = GARBAGE;
                 items[*lastID] = item;
             }
             if ((item = malloc(sizeof(Item))) == NULL) return;
@@ -112,9 +125,8 @@ static void generateStrategy(int strategy, short* newItemTimer, u8* lastID, Item
             item->y = temp;
             item->xv = BASE_HORIZONTAL_SHIFT_SPEED * 2;
             item->id = *lastID;
-            item->isGarbage = false;
+            item->type = JEWELRY;
             items[*lastID] = item;
-            strategies[3] = TICK_PER_SECOND * 3;
             strategies[5] = TICK_PER_SECOND * 3;
             break;
         case 5:
@@ -127,11 +139,10 @@ static void generateStrategy(int strategy, short* newItemTimer, u8* lastID, Item
                 item->y = (short) (38 + (i * 32));
                 item->xv = BASE_HORIZONTAL_SHIFT_SPEED * 2;
                 item->id = *lastID;
-                item->isGarbage = false;
+                item->type = JEWELRY;
                 items[*lastID] = item;
             }
             strategies[4] = TICK_PER_SECOND * 3;
-            strategies[3] = TICK_PER_SECOND * 3;
             break;
         case 6:
             for (int i = 1; i < 4; i++) {
@@ -143,7 +154,7 @@ static void generateStrategy(int strategy, short* newItemTimer, u8* lastID, Item
                 item->y = (short) (HEIGHT - 20 - (i * 32));
                 item->xv = BASE_HORIZONTAL_SHIFT_SPEED * 2;
                 item->id = *lastID;
-                item->isGarbage = false;
+                item->type = JEWELRY;
                 items[*lastID] = item;
             }
             *newItemTimer = -TICK_PER_SECOND * 2;
@@ -159,7 +170,7 @@ static void generateStrategy(int strategy, short* newItemTimer, u8* lastID, Item
                 item->y = (short) (i * 32);
                 item->xv = BASE_HORIZONTAL_SHIFT_SPEED * 2;
                 item->id = *lastID;
-                item->isGarbage = false;
+                item->type = JEWELRY;
                 items[*lastID] = item;
             }
             *newItemTimer = -TICK_PER_SECOND * 2;
@@ -175,7 +186,7 @@ static void generateStrategy(int strategy, short* newItemTimer, u8* lastID, Item
                 item->y = (short) (HEIGHT - 20 - (i * 32));
                 item->xv = BASE_HORIZONTAL_SHIFT_SPEED;
                 item->id = *lastID;
-                item->isGarbage = false;
+                item->type = JEWELRY;
                 items[*lastID] = item;
             }
             *newItemTimer = -TICK_PER_SECOND;
@@ -191,14 +202,13 @@ static void generateStrategy(int strategy, short* newItemTimer, u8* lastID, Item
                 item->y = (short) (i * 32);
                 item->xv = BASE_HORIZONTAL_SHIFT_SPEED;
                 item->id = *lastID;
-                item->isGarbage = false;
+                item->type = JEWELRY;
                 items[*lastID] = item;
             }
             *newItemTimer = -TICK_PER_SECOND;
             strategies[7] = TICK_PER_SECOND * 3;
             break;
     }
-    strategies[strategy] = TICK_PER_SECOND * 3;
 }
 
 static void randomlyMakeItems(short* newItemTimer, u8* lastID, Item* items[]) {
@@ -265,10 +275,16 @@ static void handleCollision(TrashCan* trashCan, Item* items[], u32* garbageColle
                     && items[i]->x + items[i]->width >= trashCan->x) {
                 if (items[i]->y <= trashCan->y + trashCan->height
                         && items[i]->y + items[i]->height >= trashCan->y) {
-                    if (items[i]->isGarbage) {
-                        (*garbageCollected)++;
-                    } else {
-                        (*life)--;
+                    switch (items[i]->type) {
+                        case GARBAGE:
+                            (*garbageCollected)++;
+                            break;
+                        case JEWELRY:
+                            (*life)--;
+                            break;
+                        case BONUS:
+                            *life = (short) (*life < 3 ? *life + 1 : 3);
+                            break;
                     }
                     trashCan->inflateTimer = INFLATE_SPAN;
                     free(items[i]);
