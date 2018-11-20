@@ -5,65 +5,40 @@
 #include <stdbool.h>
 
 #define TICK_PER_SECOND 60
-#define MIN_INTERVAL (TICK_PER_SECOND * 1) // change the last part only
-#define MAX_INTERVAL (TICK_PER_SECOND * 2) // change the last part only
+#define MIN_INTERVAL (TICK_PER_SECOND / 2) // change the last part only
+#define MAX_INTERVAL (TICK_PER_SECOND * 3 / 2) // change the last part only
 #define GARBAGE_CHANCE 70 // out of 100
 #define BASE_HORIZONTAL_SHIFT_SPEED 1 // in pixels
 #define BASE_VERTICAL_SHIFT_SPEED 1 // in pixels
-#define ITEM_NUMBER 16 // size of the items array
+#define ITEM_NUMBER 32 // size of the items array
 #define INFLATE_SPAN 25 // change the last part only
-
-/*
-* TA-TODO: Add any additional structs that you need for your app.
-*
-* For example, for a Snake game, one could be:
-*
-* typedef struct {
-*   int heading;
-*   int length;
-*   int x;
-*   int y;
-* } Snake;
-*
-*/
+#define STRATEGY_NUMBER 10
 
 typedef struct {
     short x;
     short y;
-    u32 width;
-    u32 height;
-    u32 inflateTimer;
+    short width;
+    short height;
+    u8 inflateTimer;
 } TrashCan;
 
 typedef struct {
     short x;
     short y;
-    u32 width;
-    u32 height;
+    short width;
+    short height;
+    short xv;
     bool isGarbage;
     u8 id;
 } Item;
 
 typedef struct {
-    // Store whether or not the game is over in this member:
     u32 garbageCollected;
-    u8 life;
+    short life;
     TrashCan* trashCan;
     Item* items[ITEM_NUMBER];
     u8 lastID;
-    u32 newItemTimer;
-
-    /*
-    * TA-TODO: Add any logical elements you need to keep track of in your app.
-    *
-    * For example, for a Snake game, those could be:
-    *
-    * Snake snake;
-    * Food foods[10];
-    * int points;
-    *
-    */
-
+    short newItemTimer;
 } AppState;
 
 // This function can initialize an unused AppState struct.

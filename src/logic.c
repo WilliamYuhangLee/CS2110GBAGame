@@ -3,21 +3,15 @@
 #include "graphics.h"
 #include "gba.h"
 
-static int __qran_seed= 42;
-static int qran(void) {
-    __qran_seed= 1664525*__qran_seed+1013904223;
-    return (__qran_seed>>16) & 0x7FFF;
+int randint(int min, int max) {
+    return rand() % (max - min + 1) + min;
 }
 
-int randint(int min, int max) {
-    return (qran()*(max-min)>>15)+min;
-}
+// store strategy timers
+static short strategies[STRATEGY_NUMBER];
 
 void initializeAppState(AppState* appState) {
-    // TA-TODO: Initialize everything that's part of this AppState struct here.
-    // Suppose the struct contains random values, make sure everything gets
-    // the value it should have when the app begins.
-    __qran_seed = vBlankCounter;
+    srand(vBlankCounter);
 
     appState->garbageCollected = 0;
     appState->life = 3;
@@ -41,35 +35,184 @@ void initializeAppState(AppState* appState) {
         appState->items[i] = NULL;
     }
     appState->lastID = ITEM_NUMBER - 1;
+
+    // Initialize strategy timers
+    for (int i = 0; i < STRATEGY_NUMBER; i++) {
+        strategies[i] = 0;
+    }
 }
 
-// TA-TODO: Add any process functions for sub-elements of your app here.
-// For example, for a snake game, you could have a processSnake function
-// or a createRandomFood function or a processFoods function.
-//
-// e.g.:
-// static Snake processSnake(Snake* currentSnake);
-// static void generateRandomFoods(AppState* currentAppState, AppState* nextAppState);
+static void generateStrategy(int strategy, short* newItemTimer, u8* lastID, Item* items[]) {
+    while(strategies[strategy] && strategy < STRATEGY_NUMBER) {
+        strategy++;
+    }
+    if (strategy >= STRATEGY_NUMBER) {strategy = 0;}
+    *newItemTimer = 0;
+    Item* item;
+    short temp;
+    switch (strategy) {
+        default:
+        case 0:
+            if ((item = malloc(sizeof(Item))) == NULL) return;
+            *lastID = (u8) ((*lastID + 1) % ITEM_NUMBER);
+            item->width = 32;
+            item->height = 32;
+            item->x = WIDTH;
+            item->y = (short) randint(0, HEIGHT - 20 - item->height);
+            item->xv = (short) BASE_HORIZONTAL_SHIFT_SPEED;
+            item->id = *lastID;
+            item->isGarbage = randint(0, 99) < GARBAGE_CHANCE;
+            items[*lastID] = item;
+            break;
+        case 1:
+        case 2:
+            if ((item = malloc(sizeof(Item))) == NULL) return;
+            *lastID = (u8) ((*lastID + 1) % ITEM_NUMBER);
+            item->width = 32;
+            item->height = 32;
+            item->x = WIDTH;
+            item->y = (short) randint(0, HEIGHT - 20 - item->height);
+            item->xv = (short) BASE_HORIZONTAL_SHIFT_SPEED * 2;
+            item->id = *lastID;
+            item->isGarbage = randint(0, 99) < GARBAGE_CHANCE;
+            items[*lastID] = item;
+            break;
+        case 3:
+            if ((item = malloc(sizeof(Item))) == NULL) return;
+            *lastID = (u8) ((*lastID + 1) % ITEM_NUMBER);
+            item->width = 32;
+            item->height = 32;
+            item->x = WIDTH;
+            item->y = (short) randint(0, HEIGHT - 20 - item->height);
+            item->xv = (short) BASE_HORIZONTAL_SHIFT_SPEED * 3;
+            item->id = *lastID;
+            item->isGarbage = randint(0, 99) < GARBAGE_CHANCE;
+            items[*lastID] = item;
+            *newItemTimer = -TICK_PER_SECOND;
+            break;
+        case 4:
+            temp = (short) randint(0, HEIGHT - 20 - 32);
+            for (int i = 0; i < 4; i++) {
+                if ((item = malloc(sizeof(Item))) == NULL) return;
+                *lastID = (u8) ((*lastID + 1) % ITEM_NUMBER);
+                item->width = 32;
+                item->height = 32;
+                item->x = (short) (WIDTH + i * item->width);
+                item->y = temp;
+                item->xv = BASE_HORIZONTAL_SHIFT_SPEED * 2;
+                item->id = *lastID;
+                item->isGarbage = true;
+                items[*lastID] = item;
+            }
+            if ((item = malloc(sizeof(Item))) == NULL) return;
+            *lastID = (u8) ((*lastID + 1) % ITEM_NUMBER);
+            item->width = 32;
+            item->height = 32;
+            item->x = (short) (WIDTH + 4 * item->width);
+            item->y = temp;
+            item->xv = BASE_HORIZONTAL_SHIFT_SPEED * 2;
+            item->id = *lastID;
+            item->isGarbage = false;
+            items[*lastID] = item;
+            strategies[3] = TICK_PER_SECOND * 3;
+            strategies[5] = TICK_PER_SECOND * 3;
+            break;
+        case 5:
+            for (int i = 0; i < 2; i++) {
+                if ((item = malloc(sizeof(Item))) == NULL) return;
+                *lastID = (u8) ((*lastID + 1) % ITEM_NUMBER);
+                item->width = 32;
+                item->height = 32;
+                item->x = WIDTH;
+                item->y = (short) (38 + (i * 32));
+                item->xv = BASE_HORIZONTAL_SHIFT_SPEED * 2;
+                item->id = *lastID;
+                item->isGarbage = false;
+                items[*lastID] = item;
+            }
+            strategies[4] = TICK_PER_SECOND * 3;
+            strategies[3] = TICK_PER_SECOND * 3;
+            break;
+        case 6:
+            for (int i = 1; i < 4; i++) {
+                if ((item = malloc(sizeof(Item))) == NULL) return;
+                *lastID = (u8) ((*lastID + 1) % ITEM_NUMBER);
+                item->width = 32;
+                item->height = 32;
+                item->x = WIDTH + (i - 1) * 20;
+                item->y = (short) (HEIGHT - 20 - (i * 32));
+                item->xv = BASE_HORIZONTAL_SHIFT_SPEED * 2;
+                item->id = *lastID;
+                item->isGarbage = false;
+                items[*lastID] = item;
+            }
+            *newItemTimer = -TICK_PER_SECOND * 2;
+            strategies[8] = TICK_PER_SECOND * 3;
+            break;
+        case 7:
+            for (int i = 0; i < 3; i++) {
+                if ((item = malloc(sizeof(Item))) == NULL) return;
+                *lastID = (u8) ((*lastID + 1) % ITEM_NUMBER);
+                item->width = 32;
+                item->height = 32;
+                item->x = WIDTH + i * 20;
+                item->y = (short) (i * 32);
+                item->xv = BASE_HORIZONTAL_SHIFT_SPEED * 2;
+                item->id = *lastID;
+                item->isGarbage = false;
+                items[*lastID] = item;
+            }
+            *newItemTimer = -TICK_PER_SECOND * 2;
+            strategies[7] = TICK_PER_SECOND * 3;
+            break;
+        case 8:
+            for (int i = 1; i < 4; i++) {
+                if ((item = malloc(sizeof(Item))) == NULL) return;
+                *lastID = (u8) ((*lastID + 1) % ITEM_NUMBER);
+                item->width = 32;
+                item->height = 32;
+                item->x = WIDTH;
+                item->y = (short) (HEIGHT - 20 - (i * 32));
+                item->xv = BASE_HORIZONTAL_SHIFT_SPEED;
+                item->id = *lastID;
+                item->isGarbage = false;
+                items[*lastID] = item;
+            }
+            *newItemTimer = -TICK_PER_SECOND;
+            strategies[6] = TICK_PER_SECOND * 3;
+            break;
+        case 9:
+            for (int i = 0; i < 3; i++) {
+                if ((item = malloc(sizeof(Item))) == NULL) return;
+                *lastID = (u8) ((*lastID + 1) % ITEM_NUMBER);
+                item->width = 32;
+                item->height = 32;
+                item->x = WIDTH;
+                item->y = (short) (i * 32);
+                item->xv = BASE_HORIZONTAL_SHIFT_SPEED;
+                item->id = *lastID;
+                item->isGarbage = false;
+                items[*lastID] = item;
+            }
+            *newItemTimer = -TICK_PER_SECOND;
+            strategies[7] = TICK_PER_SECOND * 3;
+            break;
+    }
+    strategies[strategy] = TICK_PER_SECOND * 3;
+}
 
-static void randomlyMakeItems(u32* newItemTimer, u8* lastID, Item* items[]) {
+static void randomlyMakeItems(short* newItemTimer, u8* lastID, Item* items[]) {
+    for (int i = 0; i < STRATEGY_NUMBER; i++) {
+        if (strategies[i]) {
+            strategies[i]--;
+        }
+    }
     if (*newItemTimer < MIN_INTERVAL) {
         (*newItemTimer)++;
         return;
     }
-    if (*newItemTimer >= MAX_INTERVAL || *newItemTimer >= (u32) randint(MIN_INTERVAL, MAX_INTERVAL)) {
-        *newItemTimer = 0;
-        *lastID = (u8) ((*lastID + 1) % ITEM_NUMBER);
-        Item* item = malloc(sizeof(Item));
-        if (item == NULL) {
-            return;
-        }
-        item->width = 32;
-        item->height = 32;
-        item->x = WIDTH;
-        item->y = (short) randint(0, HEIGHT - 20 - item->height);
-        item->id = *lastID;
-        item->isGarbage = randint(0, 100) <= GARBAGE_CHANCE;
-        items[*lastID] = item;
+    if (*newItemTimer >= MAX_INTERVAL || *newItemTimer >= randint(MIN_INTERVAL, MAX_INTERVAL)) {
+        generateStrategy(randint(0, STRATEGY_NUMBER - 1), newItemTimer, lastID, items);
     } else {
         (*newItemTimer)++;
     }
@@ -103,7 +246,7 @@ static void shiftItems(u32 keysPressedNow, TrashCan* trashCan, Item* items[]) {
 
     for(int i = 0; i < ITEM_NUMBER; i++) {
         if (items[i] != NULL) {
-            items[i]->x -= BASE_HORIZONTAL_SHIFT_SPEED;
+            items[i]->x -= items[i]->xv;
             if (items[i]->x < 0) {
                 free(items[i]);
                 items[i] = NULL;
@@ -112,16 +255,16 @@ static void shiftItems(u32 keysPressedNow, TrashCan* trashCan, Item* items[]) {
     }
 }
 
-static void handleCollision(TrashCan* trashCan, Item* items[], u32* garbageCollected, u8* life) {
+static void handleCollision(TrashCan* trashCan, Item* items[], u32* garbageCollected, short* life) {
     if (trashCan->inflateTimer) {
         trashCan->inflateTimer--;
     }
     for (int i = 0; i < ITEM_NUMBER; i++) {
         if (items[i] != NULL) {
-            if (items[i]->x <= trashCan->x + (short) trashCan->width
-                    && items[i]->x + (short) items[i]->width >= trashCan->x) {
-                if (items[i]->y <= trashCan->y + (short) trashCan->height
-                        && items[i]->y + (short) items[i]->height >= trashCan->y) {
+            if (items[i]->x <= trashCan->x + trashCan->width
+                    && items[i]->x + items[i]->width >= trashCan->x) {
+                if (items[i]->y <= trashCan->y + trashCan->height
+                        && items[i]->y + items[i]->height >= trashCan->y) {
                     if (items[i]->isGarbage) {
                         (*garbageCollected)++;
                     } else {
@@ -139,29 +282,6 @@ static void handleCollision(TrashCan* trashCan, Item* items[], u32* garbageColle
 // This function processes your current app state and returns the new (i.e. next)
 // state of your application.
 AppState processAppState(AppState *currentAppState, u32 keysPressedBefore, u32 keysPressedNow) {
-    /* TA-TODO: Do all of your app processing here. This function gets called
-     * every frame.
-     *
-     * To check for key presses, use the KEY_JUST_PRESSED macro for cases where
-     * you want to detect each key press once, or the KEY_DOWN macro for checking
-     * if a button is still down.
-     *
-     * To count time, suppose that the GameBoy runs at a fixed FPS (60fps) and
-     * that VBlank is processed once per frame. Use the vBlankCounter variable
-     * and the modulus % operator to do things once every (n) frames. Note that
-     * you want to process button every frame regardless (otherwise you will
-     * miss inputs.)
-     *
-     * Do not do any drawing here.
-     *
-     * TA-TODO: VERY IMPORTANT! READ THIS PART.
-     * You need to perform all calculations on the currentAppState passed to you,
-     * and perform all state updates on the nextAppState state which we define below
-     * and return at the end of the function. YOU SHOULD NOT MODIFY THE CURRENTSTATE.
-     * Modifying the currentAppState will mean the undraw function will not be able
-     * to undraw it later.
-     */
-
     AppState nextAppState = *currentAppState;
 
     handleCollision(nextAppState.trashCan, nextAppState.items, &(nextAppState.garbageCollected), &(nextAppState.life));

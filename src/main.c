@@ -125,7 +125,7 @@ int main(void) {
                     break;
                 }
                 // Check if the app is exiting. If it is, then go to the exit state.
-                if (!nextAppState.life) {
+                if (nextAppState.life <= 0) {
                     state = APP_EXIT;
                     undrawAllSprites();
                     updateOAM();
@@ -163,6 +163,7 @@ int main(void) {
 
         // Store the current state of the buttons
         previousButtons = currentButtons;
+        vBlankCounter++;
     }
 
     return 0;

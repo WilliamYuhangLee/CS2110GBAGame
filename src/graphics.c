@@ -44,7 +44,7 @@ void setUpGraphics(void) {
 // static void drawFood(Food* food);
 
 static void drawTrashCan(TrashCan* trashCan) {
-    OAMEntry* trashCanSprite = &shadow[ITEM_NUMBER + 10];
+    OAMEntry* trashCanSprite = &shadow[ITEM_NUMBER + 1];
     if (trashCan->inflateTimer) {
         trashCanSprite->attr0 = (trashCan->y & 0xFF) | SPRITES_PALETTE_TYPE | TRASH_INFLATED_SPRITE_SHAPE;
         trashCanSprite->attr1 = (trashCan->x & 0x1FF) | TRASH_INFLATED_SPRITE_SIZE;
@@ -86,20 +86,17 @@ static void undrawScore(u32 currentScore) {
     }
 }
 
-static void undrawLife(u8 currentLife, u8 nextLife) {
+static void undrawLife(char currentLife, char nextLife) {
     if (currentLife == nextLife) {
         return;
     }
     switch (nextLife) {
         case 0:
             drawRectDMA(222, 142, 16, 16, BLACK);
-            break;
         case 1:
             drawRectDMA(204, 142, 16, 16, BLACK);
-            break;
         case 2:
             drawRectDMA(186, 142, 16, 16, BLACK);
-            break;
         case 3:
         default:
             return;

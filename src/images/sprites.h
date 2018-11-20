@@ -1,14 +1,15 @@
 /*
  * Exported with nin10kit v1.7
- * Invocation command was nin10kit --mode=sprites --bpp=8 --for_bitmap --transparent==000000 sprites GT.png Garbage.png Trash_Normal.png Trash_Inflated.png 
- * Time-stamp: Monday 11/19/2018, 21:55:10
+ * Invocation command was nin10kit --mode=sprites --bpp=8 --for_bitmap --transparent=000000 sprites GT.png Garbage.png TRASH_NORMAL.png TRASH_INFLATED.png 
+ * Time-stamp: Tuesday 11/20/2018, 16:56:36
  * 
  * Image Information
  * -----------------
  * GT.png 32@32
  * Garbage.png 32@32
- * Trash_Normal.png 32@32
- * Trash_Inflated.png 32@32
+ * TRASH_NORMAL.png 32@32
+ * TRASH_INFLATED.png 32@32
+ * Transparent color: (0, 0, 0)
  * 
  * All bug reports / feature requests are to be filed here https://github.com/TricksterGuy/nin10kit/issues
  */
